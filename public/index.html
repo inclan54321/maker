@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mi Chat</title>
+</head>
+<body>
+  <ul id="messages"></ul>
+  <input id="messageInput" />
+  <button onclick="sendMessage()">Enviar</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const usuario = prompt('¿Cuál es tu nombre?');
+    
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const data = {
+        user: usuario,
+        message: input.value
+      };
+      socket.emit('chat message', data);
+      input.value = '';
+    }
+
+    socket.on('chat message', (data) => {
+      const li = document.createElement('li');
+      li.textContent = data.user + ': ' + data.message;
+      document.getElementById('messages').appendChild(li);
+    });
+  </script>
+</body>
+</html>
