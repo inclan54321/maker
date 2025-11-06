@@ -25,6 +25,23 @@
     border-radius: 5px;
     border: 1px solid #ccc;
   }
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#messages {
+  flex-grow: 1;
+  margin-bottom: 20px;
+}
+
+#messageInput, button {
+  align-self: center;
+  width: 80%;
+  max-width: 400px;
+}
+
 </style>
   <title>Mi Chat</title>
 </head>
