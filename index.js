@@ -2,15 +2,59 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const { OpenAI } = require('openai');
+
+// Configurar OpenAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+console.log('OpenAI configurado:', process.env.OPENAI_API_KEY ? 'SI' : 'NO');
 
 app.use(express.static('public'));
 
 io.on('connection', (socket) => {
-  socket.on('chat message', (data) => {
+  console.log('Usuario conectado');
+  
+  socket.on('chat message', async (data) => {
+    // 1. Primero enviar el mensaje humano a todos
     io.emit('chat message', data);
+    
+    // 2. Si mencionan @ai, generar respuesta
+    if (data.message.includes('@ai') || data.message.toLowerCase().includes('asistente')) {
+      console.log('Detectado mensaje para IA:', data.message);
+      
+      try {
+        const response = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { 
+              role: "user", 
+              content: Responde como asistente útil: ${data.message} 
+            }
+          ],
+          max_tokens: 150
+        });
+        
+        const aiResponse = {
+          user: '🤖 Asistente IA',
+          message: response.choices[0].message.content
+        };
+        
+        // 3. Enviar respuesta de IA a todos
+        io.emit('chat message', aiResponse);
+        
+      } catch (error) {
+        console.error('Error con IA:', error);
+        // Opcional: enviar mensaje de error al chat
+        const errorResponse = {
+          user: 'Sistema',
+          message: 'Lo siento, el asistente no está disponible en este momento.'
+        };
+        io.emit('chat message', errorResponse);
+      }
+    }
   });
 });
 
-http.listen(process.env.PORT || 3000, () => {
-  console.log('Servidor funcionando');
-});
+const PORT = process.env.P
