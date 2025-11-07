@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
@@ -16,5 +15,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, '0.0.0.0', () => {
-  console.log(Servidor funcionando en puerto ${PORT});
+  console.log(`Servidor funcionando en puerto ${PORT}`);
 });
