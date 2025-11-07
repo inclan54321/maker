@@ -8,7 +8,7 @@ try {
   const { OpenAI } = require('openai');
   console.log('API Key presente:', process.env.DEEPSEEK_API_KEY ? 'SI' : 'NO');
   deepseek = new OpenAI({
-    apiKey: process.env.DEEPSEEK_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY || process.env.DEEPSEEK_API_KEY,
     baseURL: "https://api.deepseek.com/v1"
   });
   console.log('✅ DeepSeek configurado');
