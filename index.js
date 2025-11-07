@@ -4,7 +4,6 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const { OpenAI } = require('openai');
 
-// Configurar OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -17,10 +16,8 @@ io.on('connection', (socket) => {
   console.log('Usuario conectado');
   
   socket.on('chat message', async (data) => {
-    // 1. Primero enviar el mensaje humano a todos
     io.emit('chat message', data);
     
-    // 2. Si mencionan @ai, generar respuesta
     if (data.message.includes('@ai') || data.message.toLowerCase().includes('asistente')) {
       console.log('Detectado mensaje para IA:', data.message);
       
@@ -30,7 +27,7 @@ io.on('connection', (socket) => {
           messages: [
             { 
               role: "user", 
-              content: Responde como asistente útil: ${data.message} 
+              content: "Responde como asistente útil: " + data.message
             }
           ],
           max_tokens: 150
@@ -41,15 +38,13 @@ io.on('connection', (socket) => {
           message: response.choices[0].message.content
         };
         
-        // 3. Enviar respuesta de IA a todos
         io.emit('chat message', aiResponse);
         
       } catch (error) {
         console.error('Error con IA:', error);
-        // Opcional: enviar mensaje de error al chat
         const errorResponse = {
           user: 'Sistema',
-          message: 'Lo siento, el asistente no está disponible en este momento.'
+          message: 'Lo siento, el asistente no está disponible.'
         };
         io.emit('chat message', errorResponse);
       }
