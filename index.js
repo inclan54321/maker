@@ -6,8 +6,6 @@ const io = require('socket.io')(http);
 app.use(express.static('public'));
 
 io.on('connection', (socket) => {
-  console.log('Usuario conectado');
-  
   socket.on('chat message', (data) => {
     io.emit('chat message', data);
   });
