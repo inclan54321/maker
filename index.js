@@ -3,19 +3,6 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
-let deepseek;
-try {
-  const { OpenAI } = require('openai');
-  console.log('API Key presente:', process.env.DEEPSEEK_API_KEY ? 'SI' : 'NO');
-  deepseek = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || process.env.DEEPSEEK_API_KEY,
-    baseURL: "https://api.deepseek.com/v1"
-  });
-  console.log('✅ DeepSeek configurado');
-} catch (error) {
-  console.log('❌ DeepSeek no disponible:', error.message);
-}
-
 app.use(express.static('public'));
 
 io.on('connection', (socket) => {
@@ -24,23 +11,25 @@ io.on('connection', (socket) => {
   socket.on('chat message', async (data) => {
     io.emit('chat message', data);
     
-    if (deepseek && data.message.includes('@ai')) {
-      console.log('Detectado mensaje para IA:', data.message);
-      
+    if (data.message.includes('@ai')) {
       try {
-        const response = await deepseek.chat.completions.create({
-          model: "deepseek-chat",
-          messages: [
-            { 
-              role: "user", 
-              content: data.message
-            }
-          ]
+        const response = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': Bearer ${process.env.DEEPSEEK_API_KEY}
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [{ role: "user", content: data.message }],
+            max_tokens: 150
+          })
         });
         
+        const result = await response.json();
         const aiResponse = {
           user: '🤖 DeepSeek',
-          message: response.choices[0].message.content
+          message: result.choices[0].message.content
         };
         
         io.emit('chat message', aiResponse);
