@@ -92,13 +92,15 @@
       max-width: 400px;
     }
   </style>
-  <title>Mi Chat App</title>
+  <title>Outlet Makers</title>
 </head>
 <body>
   <!-- Menú Principal -->
   <div class="menu-container" id="menu">
-    <h2>Bienvenido a Mi Chat App</h2>
-    <button class="menu-option" onclick="openChat()">💬 Entrar al Chat</button>
+    <h2>Outlet Makers</h2>
+    <button class="menu-option" onclick="openChat()">💬 Chat de Atención al Cliente</button>
+    <button class="menu-option" onclick="catalogo()">📦 Catálogo</button>
+    <button class="menu-option" onclick="encargos()">🎁 Encargos Especiales</button>
     <button class="menu-option" onclick="suscribirse()">⭐ Suscribirse</button>
     <button class="menu-option" onclick="acercaDe()">ℹ️ Acerca de</button>
   </div>
@@ -125,12 +127,20 @@
       }
     }
 
+    function catalogo() {
+      alert('📦 Catálogo de productos próximamente!');
+    }
+
+    function encargos() {
+      alert('🎁 Sección de encargos especiales próximamente!');
+    }
+
     function suscribirse() {
-      alert('¡Función de suscripción próximamente!');
+      alert('⭐ Función de suscripción próximamente!');
     }
 
     function acercaDe() {
-      alert('Chat App v1.0\nDesarrollado con Node.js y Socket.io');
+      alert('Outlet Makers v1.0\nTu tienda de confianza');
     }
 
     function volverAlMenu() {
