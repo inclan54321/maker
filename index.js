@@ -2,51 +2,45 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const { OpenAI } = require('openai');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
-console.log('OpenAI configurado:', process.env.OPENAI_API_KEY ? 'SI' : 'NO');
+let deepseek;
+try {
+  const { OpenAI } = require('openai');
+  deepseek = new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    baseURL: "https://api.deepseek.com/v1"
+  });
+  console.log('✅ DeepSeek configurado');
+} catch (error) {
+  console.log('❌ DeepSeek no disponible');
+}
 
 app.use(express.static('public'));
 
 io.on('connection', (socket) => {
-  console.log('Usuario conectado');
-  
   socket.on('chat message', async (data) => {
     io.emit('chat message', data);
     
-    if (data.message.includes('@ai') || data.message.toLowerCase().includes('asistente')) {
-      console.log('Detectado mensaje para IA:', data.message);
-      
+    if (deepseek && data.message.includes('@ai')) {
       try {
-        const response = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
+        const response = await deepseek.chat.completions.create({
+          model: "deepseek-chat",
           messages: [
             { 
               role: "user", 
-              content: "Responde como asistente útil: " + data.message
+              content: data.message
             }
-          ],
-          max_tokens: 150
+          ]
         });
         
         const aiResponse = {
-          user: '🤖 Asistente IA',
+          user: '🤖 DeepSeek',
           message: response.choices[0].message.content
         };
         
         io.emit('chat message', aiResponse);
-        
       } catch (error) {
-        console.error('Error con IA:', error);
-        const errorResponse = {
-          user: 'Sistema',
-          message: 'Lo siento, el asistente no está disponible.'
-        };
-        io.emit('chat message', errorResponse);
+        console.error('Error con DeepSeek:', error);
       }
     }
   });
