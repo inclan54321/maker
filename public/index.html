@@ -82,14 +82,21 @@
       overflow-y: auto;
     }
     
-    input, button {
+    input, select, button {
       padding: 10px;
       margin: 5px;
       border-radius: 5px;
       border: 1px solid #ccc;
       align-self: center;
-      width: 80%;
+      width: 100%;
       max-width: 400px;
+      box-sizing: border-box;
+    }
+
+    .form-container {
+      display: none;
+      width: 100%;
+      max-width: 500px;
     }
   </style>
   <title>Outlet Makers</title>
@@ -111,6 +118,40 @@
     <input id="messageInput" placeholder="Escribe tu mensaje..." />
     <button onclick="sendMessage()">Enviar</button>
     <button onclick="volverAlMenu()" style="background: #666; margin-top: 10px;">← Volver al Menú</button>
+  </div>
+
+  <!-- Formulario de Suscripción (oculto inicialmente) -->
+  <div class="form-container" id="suscripcionForm">
+    <div class="menu-container">
+      <h2>📋 Formulario de Suscripción</h2>
+      <form onsubmit="enviarSuscripcion(event)">
+        <input type="text" id="nombreCompleto" placeholder="Nombre Completo" required>
+        <input type="text" id="direccion" placeholder="Dirección de Envío" required>
+        
+        <select id="sexo" required>
+          <option value="">Selecciona tu sexo</option>
+          <option value="masculino">Masculino</option>
+          <option value="femenino">Femenino</option>
+          <option value="otro">Otro</option>
+        </select>
+        
+        <input type="date" id="fechaNacimiento" required>
+        <input type="email" id="email" placeholder="Correo Electrónico" required>
+        
+        <button type="submit" class="menu-option">✅ Enviar Suscripción</button>
+      </form>
+      <button onclick="volverAlMenu()" style="background: #666; margin-top: 10px; width: 100%;">← Volver al Menú</button>
+    </div>
+  </div>
+
+  <!-- Página de Confirmación (oculta inicialmente) -->
+  <div class="form-container" id="confirmacion">
+    <div class="menu-container">
+      <h2>🎉 ¡Suscripción Completada!</h2>
+      <p>Tu suscripción ha sido procesada exitosamente.</p>
+      <p>Hemos enviado un correo de verificación a tu email.</p>
+      <button onclick="volverAlMenu()" class="menu-option">← Volver al Menú Principal</button>
+    </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -136,7 +177,8 @@
     }
 
     function suscribirse() {
-      alert('⭐ Función de suscripción próximamente!');
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('suscripcionForm').style.display = 'block';
     }
 
     function acercaDe() {
@@ -144,8 +186,20 @@
     }
 
     function volverAlMenu() {
+      // Ocultar todas las secciones
       document.getElementById('chat').style.display = 'none';
+      document.getElementById('suscripcionForm').style.display = 'none';
+      document.getElementById('confirmacion').style.display = 'none';
+      
+      // Mostrar menú principal
       document.getElementById('menu').style.display = 'block';
+      
+      // Limpiar formulario
+      document.getElementById('nombreCompleto').value = '';
+      document.getElementById('direccion').value = '';
+      document.getElementById('sexo').value = '';
+      document.getElementById('fechaNacimiento').value = '';
+      document.getElementById('email').value = '';
     }
 
     // Funciones del Chat
@@ -157,6 +211,39 @@
       };
       socket.emit('chat message', data);
       input.value = '';
+    }
+
+    // Función de Suscripción
+    function enviarSuscripcion(event) {
+      event.preventDefault();
+      
+      const datos = {
+        nombre: document.getElementById('nombreCompleto').value,
+        direccion: document.getElementById('direccion').value,
+        sexo: document.getElementById('sexo').value,
+        fechaNacimiento: document.getElementById('fechaNacimiento').value,
+        email: document.getElementById('email').value
+      };
+
+      // Enviar datos al servidor
+      fetch('/suscripcion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datos)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Mostrar confirmación
+          document.getElementById('suscripcionForm').style.display = 'none';
+          document.getElementById('confirmacion').style.display = 'block';
+        }
+      })
+      .catch(error => {
+        alert('Error al enviar suscripción: ' + error);
+      });
     }
 
     socket.on('chat message', (data) => {
