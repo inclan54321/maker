@@ -57,4 +57,7 @@ io.on('connection', (socket) => {
   });
 });
 
-const PORT = process.env.P
+const PORT = process.env.PORT || 3000;
+http.listen(PORT, '0.0.0.0', () => {
+  console.log(Servidor funcionando en puerto ${PORT});
+});
