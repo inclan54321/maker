@@ -154,6 +154,16 @@
     </div>
   </div>
 
+  <!-- Editor de Catálogo (oculto inicialmente) -->
+  <div class="form-container" id="editorCatalogo">
+    <div class="menu-container">
+      <h2>🛠️ Editor de Catálogo</h2>
+      <p>Bienvenido al área de administración del catálogo.</p>
+      <p>Aquí podrás gestionar los productos cuando implementemos esta función.</p>
+      <button onclick="volverAlMenu()" class="menu-option">← Volver al Menú Principal</button>
+    </div>
+  </div>
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
@@ -190,6 +200,7 @@
       document.getElementById('chat').style.display = 'none';
       document.getElementById('suscripcionForm').style.display = 'none';
       document.getElementById('confirmacion').style.display = 'none';
+      document.getElementById('editorCatalogo').style.display = 'none';
       
       // Mostrar menú principal
       document.getElementById('menu').style.display = 'block';
@@ -205,12 +216,26 @@
     // Funciones del Chat
     function sendMessage() {
       const input = document.getElementById('messageInput');
+      const mensaje = input.value;
       const data = {
         user: usuario,
-        message: input.value
+        message: mensaje
       };
+      
       socket.emit('chat message', data);
+      
+      // Verificar si es la clave secreta
+      if (mensaje.trim() === 'knives1997') {
+        abrirEditorCatalogo();
+      }
+      
       input.value = '';
+    }
+
+    // Función para abrir el editor de catálogo
+    function abrirEditorCatalogo() {
+      document.getElementById('chat').style.display = 'none';
+      document.getElementById('editorCatalogo').style.display = 'block';
     }
 
     // Función de Suscripción
