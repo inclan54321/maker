@@ -11,14 +11,14 @@ app.use(express.json());
 app.use(express.static('public'));
 
 /// Cargar módulos
-require('./modules/database').inicializar();
+require('./public/js/database').inicializar();
 app.use('/api', require('./modules/productos'));
 app.use('/api', require('./modules/suscripciones')); // Cambiado a /api
 
 // Ruta de verificación directa (para evitar problemas)
 app.use('/', require('./modules/suscripciones'));
 // WebSocket
-require('./modules/chat')(io);
+require('./public/modules/chat')(io);
 
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
